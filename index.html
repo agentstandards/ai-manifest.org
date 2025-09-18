@@ -1,44 +1,109 @@
-<!doctype html><html lang="zh-CN"><head>
+<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Manifest · 社区草案 v0.1</title>
+<title>AI Manifest · Community Draft v0.1</title>
 <style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;max-width:920px;margin:40px auto;padding:0 16px;line-height:1.6}
-code,pre{background:#f6f8fa;border-radius:6px;padding:2px 6px}
-pre{padding:12px;overflow:auto}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;max-width:980px;margin:40px auto;padding:0 16px;line-height:1.6}
+code,pre{background:#f6f8fa;border-radius:6px;padding:2px 6px}pre{padding:12px;overflow:auto}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid #e5e7eb;padding:8px;text-align:left}
-.tag{display:inline-block;background:#eef6ff;border:1px solid #cfe3ff;color:#084298;border-radius:999px;padding:2px 10px;margin-right:6px;font-size:12px}
 .footer{margin-top:40px;padding-top:12px;border-top:1px solid #eee;color:#666;font-size:14px}
-nav a{margin-right:12px}
-</style></head><body>
+.langbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
+.langbar button{border:1px solid #ddd;background:#fff;padding:4px 10px;border-radius:6px;cursor:pointer}
+.langbar button.active{background:#111;color:#fff;border-color:#111}
+[data-lang]{display:none}
+.lang-en [data-lang="en"]{display:block}
+.lang-zh [data-lang="zh"]{display:block}
+</style></head><body class="lang-en">
+<div class="langbar">
+  <span>Language:</span>
+  <button id="btn-en">EN</button>
+  <button id="btn-zh">中文</button>
+</div>
+<div data-lang="en">
+
+<h1>AI Manifest (Community Draft v0.1)</h1>
+<p><code>/.well-known/ai.json</code> + OpenAPI/JSON Schema + JOSE/JWKS</p>
+<nav><a href="#why">Why</a> · <a href="#map">Mapping</a> · <a href="#best">Best Practices</a> · <a href="#pr">PR Copy</a></nav>
+<h2 id="why">Why (Optional Reference)</h2>
+<ul>
+<li>Discoverable: standard <code>.well-known</code> location.</li>
+<li>Interoperable: aligns with OpenAPI/JSON Schema; compatible with MCP and community agents.json.</li>
+<li>Verifiable: points to JWKS for signatures, rotation and revocation.</li>
+</ul>
+<h2 id="map">Mapping v0.1 (ai.json ↔ MCP / agents.json)</h2>
+<table><thead><tr><th>ai.json</th><th>Meaning</th><th>MCP</th><th>agents.json</th><th>Notes</th></tr></thead><tbody>
+<tr><td>manifest_version</td><td>File version</td><td>server.version (~)</td><td>schema_version</td><td>semver e.g. "0.1"</td></tr>
+<tr><td>provider.name/description</td><td>Provider</td><td>server.name/description</td><td>agents[*].org/name</td><td>Identification</td></tr>
+<tr><td>spec.openapi_url</td><td>OpenAPI</td><td>—</td><td>agents[*].openapi_url</td><td>MCP is not REST</td></tr>
+<tr><td>spec.schemas[]</td><td>JSON Schema</td><td>tools[].input_schema</td><td>agents[*].capabilities[*].schema</td><td>Input shape</td></tr>
+<tr><td>servers[{type,url}]</td><td>Endpoints</td><td>transport/endpoint</td><td>agents[*].endpoints[]</td><td>type: rest/mcp/ws/sse</td></tr>
+<tr><td>capabilities[]</td><td>Callable capabilities</td><td>tools[]</td><td>agents[*].capabilities[]</td><td>Names align</td></tr>
+<tr><td>resources[]</td><td>Read-only data</td><td>resources[]</td><td>agents[*].resources[]</td><td>Optional</td></tr>
+<tr><td>prompts[]</td><td>Preset prompts</td><td>prompts[]</td><td>agents[*].prompts[]</td><td>Optional</td></tr>
+<tr><td>auth.jwks_uri</td><td>JWKS URL</td><td>—</td><td>security.jwks_uri</td><td>Sign/rotate</td></tr>
+<tr><td>receipts.signature[]</td><td>Signature algs</td><td>—</td><td>receipts.signature</td><td>Inference receipts</td></tr>
+<tr><td>contact.*</td><td>Contact/policy</td><td>—</td><td>contact.*</td><td>Compliance</td></tr>
+</tbody></table>
+<p>Refs: <a href="https://modelcontextprotocol.io/specification#tools">MCP Tools</a> · <a href="https://modelcontextprotocol.io/specification#resources">MCP Resources</a> · <a href="https://modelcontextprotocol.io/specification#prompts">MCP Prompts</a></p>
+<h2 id="best">Best Practices</h2>
+<ul>
+<li>Path: <code>/.well-known/ai.json</code>; Content-Type: <code>application/json</code>; GET/HEAD.</li>
+<li>Version: <code>manifest_version</code>, ETag/Last-Modified, <code>max-age=3600</code>.</li>
+<li>URLs: absolute HTTPS for OpenAPI/Schema/CRL/JWKS.</li>
+<li>Trust: expose <code>auth.jwks_uri</code>, use <code>kid</code>, announce rotation windows (≥7 days), timestamp revocations.</li>
+<li>Robots: allow <code>/.well-known/ai.json</code>; other sensitive pages <code>noindex</code>.</li>
+</ul>
+<h2 id="pr">PR Two-liners</h2>
+<pre><code>AI Manifest — optional reference for /.well‑known/ai.json + OpenAPI/JSON Schema discovery (with MCP/agents.json mapping). https://ai-manifest.org
+WellKnownAI — registry/spec examples and public snapshots (no PII, mirroring allowed). https://wellknownai.org
+</code></pre>
+</div>
+<div data-lang="zh">
+
 <h1>AI Manifest（社区草案 v0.1）</h1>
-<p><span class="tag">/.well‑known/ai.json</span> <span class="tag">OpenAPI</span> <span class="tag">JSON Schema</span> <span class="tag">JOSE/JWKS</span></p>
-<nav><a href="#why">Why</a> <a href="#mapping">映射</a> <a href="#best">Best Practices</a> <a href="#ref">PR文案</a></nav>
-<p><strong>定义</strong>：AI Manifest 是放在域名 <code>/.well-known/ai.json</code> 的机器可读文件，用统一位置与格式暴露：能力清单（OpenAPI/JSON Schema 映射）、接入规则（端点/鉴权）、信任线索（JWKS/撤销）。</p>
-<h2 id="why">为什么作为“可选参考”</h2>
-<ul><li>可发现：沿用 .well‑known 约定。</li><li>可互通：字段对齐 OpenAPI/JSON Schema，兼容 MCP 与社区 agents.json。</li><li>可验证：指向 JWKS，支撑签名/轮换/撤销。</li></ul>
-<h2 id="mapping">映射 v0.1（ai.json ↔ MCP / agents.json）</h2>
+<p><code>/.well-known/ai.json</code> + OpenAPI/JSON Schema + JOSE/JWKS</p>
+<nav><a href="#why">Why</a> · <a href="#map">映射</a> · <a href="#best">最佳实践</a> · <a href="#pr">PR文案</a></nav>
+<h2 id="why">为什么（可选参考）</h2>
+<ul><li>可发现：<code>.well-known</code> 统一入口。</li><li>可互通：对齐 OpenAPI/JSON Schema；兼容 MCP/agents.json。</li><li>可验证：指向 JWKS，支持签名/轮换/撤销。</li></ul>
+<h2 id="map">映射 v0.1（ai.json ↔ MCP / agents.json）</h2>
+
 <table><thead><tr><th>ai.json</th><th>语义</th><th>MCP</th><th>agents.json</th><th>备注</th></tr></thead><tbody>
-<tr><td>manifest_version</td><td>版本</td><td>server.version（近似）</td><td>schema_version</td><td>semver 如 "0.1"</td></tr>
+<tr><td>manifest_version</td><td>版本</td><td>server.version</td><td>schema_version</td><td>semver</td></tr>
 <tr><td>provider.name/description</td><td>提供方</td><td>server.name/description</td><td>agents[*].org/name</td><td>标识</td></tr>
 <tr><td>spec.openapi_url</td><td>OpenAPI</td><td>—</td><td>agents[*].openapi_url</td><td>MCP 非 REST</td></tr>
 <tr><td>spec.schemas[]</td><td>JSON Schema</td><td>tools[].input_schema</td><td>agents[*].capabilities[*].schema</td><td>入参结构</td></tr>
 <tr><td>servers[{type,url}]</td><td>端点</td><td>transport/endpoint</td><td>agents[*].endpoints[]</td><td>type: rest/mcp/ws/sse</td></tr>
 <tr><td>capabilities[]</td><td>能力</td><td>tools[]</td><td>agents[*].capabilities[]</td><td>名称对齐</td></tr>
-<tr><td>resources[]</td><td>只读资源</td><td>resources[]</td><td>agents[*].resources[]</td><td>选填</td></tr>
-<tr><td>prompts[]</td><td>预置提示</td><td>prompts[]</td><td>agents[*].prompts[]</td><td>选填</td></tr>
+<tr><td>resources[]</td><td>资源</td><td>resources[]</td><td>agents[*].resources[]</td><td>选填</td></tr>
+<tr><td>prompts[]</td><td>提示词</td><td>prompts[]</td><td>agents[*].prompts[]</td><td>选填</td></tr>
 <tr><td>auth.jwks_uri</td><td>公钥集</td><td>—</td><td>security.jwks_uri</td><td>验签/轮换</td></tr>
 <tr><td>receipts.signature[]</td><td>签名算法</td><td>—</td><td>receipts.signature</td><td>推理收据</td></tr>
 <tr><td>contact.*</td><td>联系/政策</td><td>—</td><td>contact.*</td><td>合规</td></tr>
 </tbody></table>
-<p>参考：<a href="https://modelcontextprotocol.io/specification#tools">MCP Tools</a> · <a href="https://modelcontextprotocol.io/specification#resources">MCP Resources</a> · <a href="https://modelcontextprotocol.io/specification#prompts">MCP Prompts</a></p>
-<h2 id="best">Best Practices</h2>
-<ul><li>路径：/.well‑known/ai.json；Content‑Type: application/json；GET/HEAD。</li><li>版本：manifest_version（如 "0.1"）；ETag/Last‑Modified；max‑age=3600。</li><li>URL：绝对 HTTPS（OpenAPI/Schema/CRL/JWKS）。</li><li>信任：auth.jwks_uri；kid；轮换窗口≥7天；撤销记时。</li><li>robots：允许抓取 /.well‑known/ai.json；敏感页 noindex。</li></ul>
-<h2 id="ref">PR 用两行（中/英）</h2>
+<h2 id="best">最佳实践</h2>
+<ul><li>路径：<code>/.well-known/ai.json</code>；类型 <code>application/json</code>；GET/HEAD。</li><li>版本：<code>manifest_version</code>；ETag/Last-Modified；<code>max-age=3600</code>。</li><li>URL：HTTPS 绝对地址（OpenAPI/Schema/CRL/JWKS）。</li><li>信任：<code>auth.jwks_uri</code>、<code>kid</code>、≥7天轮换公告、撤销记时。</li><li>robots：允许抓取 <code>/.well-known/ai.json</code>；敏感页 noindex。</li></ul>
+<h2 id="pr">PR 两行</h2>
 <pre><code>AI Manifest — optional reference for /.well‑known/ai.json + OpenAPI/JSON Schema discovery (with MCP/agents.json mapping). https://ai-manifest.org
 WellKnownAI — registry/spec examples and public snapshots (no PII, mirroring allowed). https://wellknownai.org
 </code></pre>
-<div class="footer"><p>Last updated: <span id="d"></span></p><p id="pledge"></p></div>
+</div>
+<div class="footer"><p>Last updated: <span id="d"></span></p></div>
 <script>
-document.getElementById('d').textContent = new Date().toISOString().slice(0,10);
-document.getElementById('pledge').textContent = "Public layer is free, zero‑PII, no ranking or pay‑to‑play. Mirroring allowed. Snapshots and hashchain for auditability. Foundation/multi‑stakeholder custody if adoption threshold is met. Contact: agentstandards@gmail.com · GitHub: https://github.com/agentstandards";
-</script></body></html>
+(function(){
+  const LS='ai-lang';
+  const pref = localStorage.getItem(LS);
+  let lang = pref || 'en' || ((navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en');
+  set(lang);
+  document.getElementById('btn-en').onclick=()=>set('en');
+  document.getElementById('btn-zh').onclick=()=>set('zh');
+  function set(l){
+    document.body.classList.remove('lang-en','lang-zh');
+    document.body.classList.add('lang-'+l);
+    document.documentElement.lang = (l==='zh'?'zh-CN':'en');
+    localStorage.setItem(LS,l);
+    document.getElementById('btn-en').classList.toggle('active', l==='en');
+    document.getElementById('btn-zh').classList.toggle('active', l==='zh');
+  }
+  document.getElementById('d').textContent=new Date().toISOString().slice(0,10);
+})();
+</script>
+</body></html>
