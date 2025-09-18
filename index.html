@@ -2,23 +2,11 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Manifest · Community Draft v0.1</title>
 <style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;max-width:980px;margin:40px auto;padding:0 16px;line-height:1.6}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;max-width:960px;margin:40px auto;padding:0 16px;line-height:1.6}
 code,pre{background:#f6f8fa;border-radius:6px;padding:2px 6px}pre{padding:12px;overflow:auto}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid #e5e7eb;padding:8px;text-align:left}
 .footer{margin-top:40px;padding-top:12px;border-top:1px solid #eee;color:#666;font-size:14px}
-.langbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
-.langbar button{border:1px solid #ddd;background:#fff;padding:4px 10px;border-radius:6px;cursor:pointer}
-.langbar button.active{background:#111;color:#fff;border-color:#111}
-[data-lang]{display:none}
-.lang-en [data-lang="en"]{display:block}
-.lang-zh [data-lang="zh"]{display:block}
-</style></head><body class="lang-en">
-<div class="langbar">
-  <span>Language:</span>
-  <button id="btn-en">EN</button>
-  <button id="btn-zh">中文</button>
-</div>
-<div data-lang="en">
+</style></head><body>
 
 <h1>AI Manifest (Community Draft v0.1)</h1>
 <p><code>/.well-known/ai.json</code> + OpenAPI/JSON Schema + JOSE/JWKS</p>
@@ -56,54 +44,6 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #e5e7eb;padding
 <pre><code>AI Manifest — optional reference for /.well‑known/ai.json + OpenAPI/JSON Schema discovery (with MCP/agents.json mapping). https://ai-manifest.org
 WellKnownAI — registry/spec examples and public snapshots (no PII, mirroring allowed). https://wellknownai.org
 </code></pre>
-</div>
-<div data-lang="zh">
-
-<h1>AI Manifest（社区草案 v0.1）</h1>
-<p><code>/.well-known/ai.json</code> + OpenAPI/JSON Schema + JOSE/JWKS</p>
-<nav><a href="#why">Why</a> · <a href="#map">映射</a> · <a href="#best">最佳实践</a> · <a href="#pr">PR文案</a></nav>
-<h2 id="why">为什么（可选参考）</h2>
-<ul><li>可发现：<code>.well-known</code> 统一入口。</li><li>可互通：对齐 OpenAPI/JSON Schema；兼容 MCP/agents.json。</li><li>可验证：指向 JWKS，支持签名/轮换/撤销。</li></ul>
-<h2 id="map">映射 v0.1（ai.json ↔ MCP / agents.json）</h2>
-
-<table><thead><tr><th>ai.json</th><th>语义</th><th>MCP</th><th>agents.json</th><th>备注</th></tr></thead><tbody>
-<tr><td>manifest_version</td><td>版本</td><td>server.version</td><td>schema_version</td><td>semver</td></tr>
-<tr><td>provider.name/description</td><td>提供方</td><td>server.name/description</td><td>agents[*].org/name</td><td>标识</td></tr>
-<tr><td>spec.openapi_url</td><td>OpenAPI</td><td>—</td><td>agents[*].openapi_url</td><td>MCP 非 REST</td></tr>
-<tr><td>spec.schemas[]</td><td>JSON Schema</td><td>tools[].input_schema</td><td>agents[*].capabilities[*].schema</td><td>入参结构</td></tr>
-<tr><td>servers[{type,url}]</td><td>端点</td><td>transport/endpoint</td><td>agents[*].endpoints[]</td><td>type: rest/mcp/ws/sse</td></tr>
-<tr><td>capabilities[]</td><td>能力</td><td>tools[]</td><td>agents[*].capabilities[]</td><td>名称对齐</td></tr>
-<tr><td>resources[]</td><td>资源</td><td>resources[]</td><td>agents[*].resources[]</td><td>选填</td></tr>
-<tr><td>prompts[]</td><td>提示词</td><td>prompts[]</td><td>agents[*].prompts[]</td><td>选填</td></tr>
-<tr><td>auth.jwks_uri</td><td>公钥集</td><td>—</td><td>security.jwks_uri</td><td>验签/轮换</td></tr>
-<tr><td>receipts.signature[]</td><td>签名算法</td><td>—</td><td>receipts.signature</td><td>推理收据</td></tr>
-<tr><td>contact.*</td><td>联系/政策</td><td>—</td><td>contact.*</td><td>合规</td></tr>
-</tbody></table>
-<h2 id="best">最佳实践</h2>
-<ul><li>路径：<code>/.well-known/ai.json</code>；类型 <code>application/json</code>；GET/HEAD。</li><li>版本：<code>manifest_version</code>；ETag/Last-Modified；<code>max-age=3600</code>。</li><li>URL：HTTPS 绝对地址（OpenAPI/Schema/CRL/JWKS）。</li><li>信任：<code>auth.jwks_uri</code>、<code>kid</code>、≥7天轮换公告、撤销记时。</li><li>robots：允许抓取 <code>/.well-known/ai.json</code>；敏感页 noindex。</li></ul>
-<h2 id="pr">PR 两行</h2>
-<pre><code>AI Manifest — optional reference for /.well‑known/ai.json + OpenAPI/JSON Schema discovery (with MCP/agents.json mapping). https://ai-manifest.org
-WellKnownAI — registry/spec examples and public snapshots (no PII, mirroring allowed). https://wellknownai.org
-</code></pre>
-</div>
 <div class="footer"><p>Last updated: <span id="d"></span></p></div>
-<script>
-(function(){
-  const LS='ai-lang';
-  const pref = localStorage.getItem(LS);
-  let lang = pref || 'en' || ((navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en');
-  set(lang);
-  document.getElementById('btn-en').onclick=()=>set('en');
-  document.getElementById('btn-zh').onclick=()=>set('zh');
-  function set(l){
-    document.body.classList.remove('lang-en','lang-zh');
-    document.body.classList.add('lang-'+l);
-    document.documentElement.lang = (l==='zh'?'zh-CN':'en');
-    localStorage.setItem(LS,l);
-    document.getElementById('btn-en').classList.toggle('active', l==='en');
-    document.getElementById('btn-zh').classList.toggle('active', l==='zh');
-  }
-  document.getElementById('d').textContent=new Date().toISOString().slice(0,10);
-})();
-</script>
+<script>document.getElementById('d').textContent=new Date().toISOString().slice(0,10);</script>
 </body></html>
